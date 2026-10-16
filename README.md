@@ -4,11 +4,27 @@ A small website served by a plain Node.js `http` server, with no frameworks. Bui
 
 ## Running it
 
+Create a `.env` file in the project root (see `.env.sample`):
+
 ```
-node index.js
+PORT=8080
 ```
 
-Then open http://localhost:8080. For auto-restart while editing, use `node --watch index.js`.
+Then start the server:
+
+```
+node --env-file=.env index.js
+```
+
+Open http://localhost:8080 (or whatever port you set). For auto-restart while editing, use `node --watch --env-file=.env index.js`.
+
+## Environment variables
+
+| Name | Purpose |
+| --- | --- |
+| `PORT` | The port the server listens on |
+
+`.env` is gitignored. Copy `.env.sample` to `.env` and fill it in.
 
 ## Routes
 
@@ -18,7 +34,7 @@ Then open http://localhost:8080. For auto-restart while editing, use `node --wat
 | `/index` | `index.html` |
 | `/about` | `about.html` |
 | `/contact-me` | `contact-me.html` |
-| anything else | `404.html` (with a real 404 status) |
+| anything else | `404.html` |
 
 Query strings are ignored, so `/about?x=1` still serves the about page.
 
@@ -41,8 +57,8 @@ I built it in small stages and tested each one before moving on:
 - **`url.pathname` over `req.url`:** `req.url` includes the query string, which broke matching on `/about?x=1`.
 - **Allow-list routing:** I only serve filenames from a fixed list instead of building them from user input, so visitors can't choose which file the server opens.
 - **404 vs 500:** an unknown page is the visitor's problem (404). A failed file read is the server's problem (500).
+- **Environment variables:** settings that change per environment live in a gitignored `.env` file and are read with `process.env`, so the code stays the same everywhere. Values are always strings.
 
 ## Known limitations
 
 - A URL starting with `//` (like `localhost:8080//`) is parsed as a hostname, so `new URL` throws and the visitor gets a 500. A 400 would be more accurate. `//about` serves the index page for the same reason.
-- The port (`8080`) is hardcoded. Environment variables are the next lesson.

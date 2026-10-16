@@ -27,4 +27,4 @@ http.createServer(async (req, res) => {
         res.end('Error 500');
         console.log(err);
     }
-}).listen(8080);
+}).listen(process.env.PORT);
