@@ -1,31 +1,19 @@
-import * as http from 'node:http';
-import fs from 'node:fs/promises';
 import express from 'express';
 
-http.createServer(async (req, res) => {
-    let data;
-    const pageAccess = ['/index', '/about', '/contact-me'];
+const app = express();
 
-    try {
-        const url = new URL(req.url, 'http://localhost:8080');
+const PORT = process.env.PORT || 3000;
+const sendFileOptions = {
+    root: import.meta.dirname,
+};
 
-        if (url.pathname === '/') {
-            data = await fs.readFile('index.html', { encoding: 'utf8'} );
-            res.writeHead(200, { 'Content-Type': 'text/html'} );
-        }
-        else if (pageAccess.includes(url.pathname)) {
-            data = await fs.readFile(`.${url.pathname}.html`, { encoding: 'utf8' });
-            res.writeHead(200, { 'Content-Type': 'text/html'} );
-        }
-        else {
-            data = await fs.readFile('404.html', { encoding: 'utf8' });
-            res.writeHead(404, { 'Content-Type': 'text/html'} );
-        }
-        res.end(data);
+app.get('/', (req, res) => {
+    res.sendFile('index.html', sendFileOptions);
+});
 
-    } catch (err) {
-        res.writeHead(500, {'Content-Type': 'text/html'});
-        res.end('Error 500');
-        console.log(err);
+app.listen(PORT, (error) => {
+    if (error) {
+        throw error;
     }
-}).listen(process.env.PORT);
+    console.log(`Listening on port ${PORT}!`);
+});
